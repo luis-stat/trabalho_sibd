@@ -1,0 +1,146 @@
+{% extends "hospital/dashboard_base.html" %}
+{% block title %}Painel tático{% endblock %}
+{% block subtitulo %}Painel do Chefe de Departamento{% endblock %}
+
+{% block content %}
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-label">Tempo Medio por Procedimento</div>
+        <div class="kpi-valor">{{ tempo_medio }} min</div>
+        <div class="kpi-sub">Media de duracao registrada</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Custo Medio por Procedimento</div>
+        <div class="kpi-valor">R$ {{ custo_medio }}</div>
+        <div class="kpi-sub">Media dos custos de procedimentos</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Total de Atendimentos</div>
+        <div class="kpi-valor">{{ total_atendimentos }}</div>
+        <div class="kpi-sub">Atendimentos registrados no sistema</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Total de Procedimentos</div>
+        <div class="kpi-valor">{{ total_procedimentos }}</div>
+        <div class="kpi-sub">Procedimentos vinculados a atendimentos</div>
+    </div>
+</div>
+
+<div class="duas-colunas">
+    <div class="secao">
+        <div class="secao-titulo">Produtividade por Medico</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Medico</th>
+                    <th>Setor</th>
+                    <th>Atendimentos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in produtividade %}
+                <tr>
+                    <td>{{ p.funcionario_medico__nome|default:"-" }}</td>
+                    <td>{{ p.funcionario_medico__setor|default:"-" }}</td>
+                    <td><span class="tag">{{ p.total_atendimentos }}</span></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3">Nenhum dado disponivel.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="secao">
+        <div class="secao-titulo">Cobertura de Medicos por Especialidade</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Especialidade</th>
+                    <th>Qtd. Medicos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in cobertura_especialidade %}
+                <tr>
+                    <td>{{ c.especialidade }}</td>
+                    <td>{{ c.total }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2">Nenhum medico cadastrado com cargo Medico.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="duas-colunas">
+    <div class="secao">
+        <div class="secao-titulo">Cobertura de Escalas por Turno</div>
+        <table>
+            <thead>
+                <tr><th>Turno</th><th>Escalas Programadas</th></tr>
+            </thead>
+            <tbody>
+                {% for e in escala_por_turno %}
+                <tr>
+                    <td>{{ e.turno }}</td>
+                    <td>{{ e.total }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2">Nenhuma escala registrada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="secao">
+        <div class="secao-titulo">Escalas por Setor</div>
+        <table>
+            <thead>
+                <tr><th>Setor</th><th>Escalas</th></tr>
+            </thead>
+            <tbody>
+                {% for e in escala_por_setor %}
+                <tr>
+                    <td>{{ e.funcionario__setor }}</td>
+                    <td>{{ e.total }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2">Nenhuma escala registrada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="secao">
+    <div class="secao-titulo">Atendimentos por Tipo</div>
+    {% with max_val=total_atendimentos %}
+    <table>
+        <thead>
+            <tr><th>Tipo</th><th>Quantidade</th><th>Distribuicao</th></tr>
+        </thead>
+        <tbody>
+            {% for a in atendimentos_por_tipo %}
+            <tr>
+                <td>{{ a.tipo_atendimento }}</td>
+                <td>{{ a.total }}</td>
+                <td>
+                    <div class="barra-wrap">
+                        <div class="barra-bg">
+                            {% widthratio a.total max_val 100 as pct %}
+                            <div class="barra-fill" style="width:{{ pct }}%;"></div>
+                        </div>
+                        <span class="barra-pct">{{ pct }}%</span>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">Nenhum atendimento registrado.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endwith %}
+</div>
+{% endblock %}

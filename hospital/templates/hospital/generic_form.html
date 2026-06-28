@@ -1,0 +1,22 @@
+{% extends "hospital/base.html" %}
+{% block title %}Inserir {{ label }}{% endblock %}
+{% block content %}
+<h1 class="secao-titulo">Inserir Registro - {{ label }}</h1>
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div>
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+            <div class="mensagem">{{ field.errors }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn">Salvar</button>
+        <a class="btn btn-secundario" href="{% url 'list_view' model_slug=slug %}">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

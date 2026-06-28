@@ -1,0 +1,138 @@
+{% extends "hospital/dashboard_base.html" %}
+{% block title %}Painel operacional{% endblock %}
+{% block subtitulo %}Painel do Farmacêutico{% endblock %}
+
+{% block content %}
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-label">Total Dispensado (Saidas)</div>
+        <div class="kpi-valor">{{ total_dispensado }}</div>
+        <div class="kpi-sub">Unidades com tipo SAIDA registradas</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Total de Entradas no Estoque</div>
+        <div class="kpi-valor">{{ entradas }}</div>
+        <div class="kpi-sub">Unidades recebidas no periodo</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Total de Saidas do Estoque</div>
+        <div class="kpi-valor">{{ saidas }}</div>
+        <div class="kpi-sub">Unidades dispensadas no periodo</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Medicamentos Proximos ao Vencimento</div>
+        <div class="kpi-valor">{{ vencendo|length }}</div>
+        <div class="kpi-sub">Vencimento nos proximos 90 dias</div>
+    </div>
+</div>
+
+<div class="duas-colunas">
+    <div class="secao">
+        <div class="secao-titulo">Consumo de Medicamentos (Saidas)</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Medicamento</th>
+                    <th>Total Dispensado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in consumo_por_medicamento %}
+                <tr>
+                    <td>{{ item.medicamento__descricao }}</td>
+                    <td>{{ item.total_saida }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2">Nenhuma saida registrada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="secao">
+        <div class="secao-titulo">Controle de Estoque Atual</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Medicamento</th>
+                    <th>Lote</th>
+                    <th>Qtd. Estoque</th>
+                    <th>Custo Unit. (R$)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for med in estoque %}
+                <tr>
+                    <td>{{ med.descricao }}</td>
+                    <td>{{ med.lote }}</td>
+                    <td>
+                        {% if med.quantidade_estoque < 50 %}
+                        <span class="tag tag-vermelha">{{ med.quantidade_estoque }}</span>
+                        {% elif med.quantidade_estoque < 150 %}
+                        <span class="tag tag-amarela">{{ med.quantidade_estoque }}</span>
+                        {% else %}
+                        <span class="tag tag-verde">{{ med.quantidade_estoque }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ med.custo_unitario|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4">Nenhum medicamento cadastrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="duas-colunas">
+    <div class="secao">
+        <div class="secao-titulo">Movimentacoes por Funcionario Responsavel</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Funcionario</th>
+                    <th>Setor</th>
+                    <th>Movimentacoes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in movimentacao_por_funcionario %}
+                <tr>
+                    <td>{{ m.funcionario_responsavel__nome|default:"-" }}</td>
+                    <td>{{ m.funcionario_responsavel__setor|default:"-" }}</td>
+                    <td>{{ m.total }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3">Nenhuma movimentacao registrada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="secao">
+        <div class="secao-titulo">Medicamentos Proximos ao Vencimento</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Medicamento</th>
+                    <th>Lote</th>
+                    <th>Validade</th>
+                    <th>Estoque</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for med in vencendo %}
+                <tr>
+                    <td>{{ med.descricao }}</td>
+                    <td>{{ med.lote }}</td>
+                    <td><span class="tag tag-amarela">{{ med.validade }}</span></td>
+                    <td>{{ med.quantidade_estoque }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4">Nenhum medicamento proximo ao vencimento.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends "hospital/base.html" %}
+{% block title %}Diagrama ER{% endblock %}
+{% block content %}
+<h1 class="secao-titulo">Diagrama Entidade-Relacionamento</h1>
+<div class="card">
+<div class="mermaid">
+erDiagram
+    CONVENIO ||--o{ PACIENTE : "cobre"
+    CONVENIO ||--o{ ATENDIMENTO : "financia"
+    PACIENTE ||--o{ ATENDIMENTO : "realiza"
+    PACIENTE ||--o{ INTERNACAO : "sofre"
+    PACIENTE ||--o{ PROCESSO_JURIDICO : "move"
+    
+    FUNCIONARIO ||--o{ ATENDIMENTO : "conduz (médico)"
+    FUNCIONARIO ||--o{ EXAME : "solicita"
+    FUNCIONARIO ||--o{ ESCALA : "cumpre"
+    FUNCIONARIO ||--o{ AUSENCIA_FALTA : "registra"
+    FUNCIONARIO ||--o{ MOVIMENTACAO_ESTOQUE : "responsável por"
+    
+    ATENDIMENTO ||--o{ PROCEDIMENTO : "gera"
+    ATENDIMENTO ||--o{ EXAME : "gera"
+    ATENDIMENTO ||--o| PESQUISA_SATISFACAO : "recebe"
+    
+    EQUIPAMENTO ||--o{ PROCEDIMENTO : "utilizado em"
+    EQUIPAMENTO ||--o{ EXAME : "utilizado em"
+    EQUIPAMENTO ||--o{ MANUTENCAO : "passa por"
+    
+    LEITO ||--o{ INTERNACAO : "abriga"
+    MEDICAMENTO ||--o{ MOVIMENTACAO_ESTOQUE : "sofre"
+
+    %% Relacionamentos do Financeiro (Livro-Caixa Centralizado)
+    ATENDIMENTO ||--o{ FINANCEIRO : "gera lançamento"
+    PROCEDIMENTO ||--o{ FINANCEIRO : "gera lançamento"
+    CONVENIO ||--o{ FINANCEIRO : "gera repasse"
+    EQUIPAMENTO ||--o{ FINANCEIRO : "gera custo/despesa"
+    MEDICAMENTO ||--o{ FINANCEIRO : "gera custo"
+    FUNCIONARIO ||--o{ FINANCEIRO : "gera despesa (salário)"
+    PROCESSO_JURIDICO ||--o{ FINANCEIRO : "gera custo"
+
+    PACIENTE {
+        string Nome
+        string CPF
+        string Sexo
+        date Data_Nascimento
+        string Endereco
+        string Telefone
+    }
+    CONVENIO {
+        string Nome
+        decimal Percentual_Repasse
+        int Prazo_Pagamento
+    }
+    FUNCIONARIO {
+        string Nome
+        string Cargo
+        string Especialidade
+        decimal Salario
+        string Setor
+        date Data_Admissao
+    }
+    ATENDIMENTO {
+        datetime Data_Hora_Chegada
+        datetime Data_Hora_Inicio
+        datetime Data_Hora_Fim
+        string Tipo_Atendimento
+    }
+    PROCEDIMENTO {
+        string Especialidade
+        string Descricao
+        decimal Custo
+        decimal Valor_Cobrado
+        int Duracao
+    }
+    EXAME {
+        string Tipo_Exame
+        string Status
+        datetime Data_Solicitacao
+        datetime Data_Resultado
+    }
+    LEITO {
+        string Setor
+        string Tipo
+        string Status
+    }
+    INTERNACAO {
+        datetime Data_Entrada
+        datetime Data_Saida
+    }
+    MEDICAMENTO {
+        string Descricao
+        string Lote
+        date Validade
+        int Quantidade_Estoque
+        decimal Custo_Unitario
+    }
+    MOVIMENTACAO_ESTOQUE {
+        string Tipo_Movimentacao
+        int Quantidade
+        datetime Data
+        string Setor_Destino
+    }
+    EQUIPAMENTO {
+        string Descricao
+        string Setor
+        date Data_Aquisicao
+        decimal Custo_Aquisicao
+        string Status
+    }
+    MANUTENCAO {
+        date Data_Abertura
+        date Data_Fechamento
+        decimal Custo
+        string Tipo
+    }
+    FINANCEIRO {
+        string Categoria
+        decimal Valor
+        date Data
+        string Centro_Custo
+        string Tipo_Receita_Despesa
+    }
+    ESCALA {
+        date Data
+        string Turno
+        string Plantao
+        int Horas
+    }
+    PESQUISA_SATISFACAO {
+        int Nota
+        string Comentario
+        datetime Data_Avaliacao
+    }
+    AUSENCIA_FALTA {
+        date Data_Inicio
+        date Data_Fim
+        string Motivo
+        string Tipo
+    }
+    PROCESSO_JURIDICO {
+        string Tipo
+        date Data_Abertura
+        string Status
+        decimal Custo_Estimado
+    }
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: "base",
+        themeVariables: {
+            primaryColor: "#f4f4f5",
+            primaryTextColor: "#1e293b",
+            primaryBorderColor: "#1d4ed8",
+            lineColor: "#1d4ed8",
+            secondaryColor: "#e5e7eb",
+            tertiaryColor: "#ffffff"
+        }
+    });
+</script>
+{% endblock %}

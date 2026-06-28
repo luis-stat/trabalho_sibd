@@ -1,0 +1,24 @@
+{% extends "hospital/base.html" %}
+{% block title %}Painel{% endblock %}
+{% block content %}
+<div class="barra-acoes">
+    <h1 class="secao-titulo">Painel Geral</h1>
+    <form method="post" action="{% url 'popular_mock' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn">Popular Banco com Dados Mockados</button>
+    </form>
+</div>
+
+<div class="grid-cards">
+    {% for card in cards %}
+    <div class="entity-card">
+        <h3>{{ card.label }}</h3>
+        <div class="total">{{ card.total }}</div>
+        <div class="acoes">
+            <a class="btn" href="{% url 'list_view' model_slug=card.slug %}">Ver Registros</a>
+            <a class="btn btn-secundario" href="{% url 'create_view' model_slug=card.slug %}">Inserir</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends "hospital/dashboard_base.html" %}
+{% block title %}Painel estratégico{% endblock %}
+{% block subtitulo %}Painel do Diretor-Geral{% endblock %}
+
+{% block content %}
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-label">Receita Total</div>
+        <div class="kpi-valor">R$ {{ receita_total|floatformat:2 }}</div>
+        <div class="kpi-sub">Soma de todos os lancamentos de receita</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Taxa de Ocupacao Hospitalar</div>
+        <div class="kpi-valor">{{ taxa_ocupacao }}%</div>
+        <div class="kpi-sub">{{ leitos_ocupados }} ocupados de {{ total_leitos }} leitos</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Custo Total - Processos Juridicos</div>
+        <div class="kpi-valor">R$ {{ custo_processos|floatformat:2 }}</div>
+        <div class="kpi-sub">{{ processos_abertos }} abertos | {{ processos_andamento }} em andamento</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Total de Convenios Ativos</div>
+        <div class="kpi-valor">{{ participacao_convenios|length }}</div>
+        <div class="kpi-sub">Convenios com atendimentos registrados</div>
+    </div>
+</div>
+
+<div class="duas-colunas">
+    <div class="secao">
+        <div class="secao-titulo">Lucro por Especialidade</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Especialidade</th>
+                    <th>Receita (R$)</th>
+                    <th>Custo (R$)</th>
+                    <th>Lucro (R$)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in lucro_por_especialidade %}
+                <tr>
+                    <td>{{ item.especialidade }}</td>
+                    <td>{{ item.receita|floatformat:2 }}</td>
+                    <td>{{ item.custo|floatformat:2 }}</td>
+                    <td>
+                        {% if item.lucro >= 0 %}
+                        <span class="tag tag-verde">+ R$ {{ item.lucro|floatformat:2 }}</span>
+                        {% else %}
+                        <span class="tag tag-vermelha">R$ {{ item.lucro|floatformat:2 }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4">Nenhum dado disponivel.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="secao">
+        <div class="secao-titulo">Participacao por Convenio</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Convenio</th>
+                    <th>Atendimentos</th>
+                    <th>Receita Associada (R$)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in participacao_convenios %}
+                <tr>
+                    <td>{{ c.convenio__nome }}</td>
+                    <td>{{ c.total_atendimentos }}</td>
+                    <td>{{ c.receita|default:"0.00"|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3">Nenhum dado disponivel.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="secao">
+    <div class="secao-titulo">Taxa de Ocupacao de Leitos</div>
+    <div class="barra-wrap" style="max-width:600px; margin-bottom:16px;">
+        <span style="font-size:13px; min-width:80px;">Ocupados</span>
+        <div class="barra-bg">
+            <div class="barra-fill" style="width:{{ taxa_ocupacao_int }}%;"></div>
+        </div>
+        <span class="barra-pct">{{ taxa_ocupacao }}%</span>
+    </div>
+    <table style="max-width:420px;">
+        <thead>
+            <tr><th>Situacao</th><th>Quantidade</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="tag tag-vermelha">Ocupados</span></td>
+                <td>{{ leitos_ocupados }}</td>
+            </tr>
+            <tr>
+                <td><span class="tag tag-verde">Disponiveis</span></td>
+                <td>{{ leitos_disponiveis }}</td>
+            </tr>
+            <tr>
+                <td><span class="tag">Total de Leitos</span></td>
+                <td>{{ total_leitos }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

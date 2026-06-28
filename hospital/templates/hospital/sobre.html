@@ -1,0 +1,35 @@
+{% extends "hospital/base.html" %}
+{% block title %}Sobre{% endblock %}
+{% block content %}
+<h1 class="secao-titulo">Sobre o Projeto</h1>
+
+<div class="card">
+    <div class="info-grid">
+        <div class="info-bloco">
+            <h4>Disciplina</h4>
+            <p>CK0084 - Sistema de Informações e Banco de Dados</p>
+        </div>
+        <div class="info-bloco">
+            <h4>Trabalho</h4>
+            <p>2º Trabalho Parcial</p>
+        </div>
+        <div class="info-bloco">
+            <h4>Tecnologias</h4>
+            <p>Python, Django, SQLite, Mermaid.js</p>
+        </div>
+        <div class="info-bloco">
+            <h4>Domínio</h4>
+            <p>Gestão de Hospital</p>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3 class="secao-titulo">Equipe</h3>
+    <ul class="equipe-lista">
+        {% for membro in equipe %}
+        <li><strong>{{ membro.nome }}</strong> - Matrícula {{ membro.matricula }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

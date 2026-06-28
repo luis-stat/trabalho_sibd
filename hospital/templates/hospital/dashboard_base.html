@@ -1,0 +1,249 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>{% block title %}Dashboard{% endblock %} - Hospital Olivia Gray</title>
+<style>
+    :root {
+        --azul: #1d4ed8;
+        --azul-escuro: #1e293b;
+        --azul-claro: #3b82f6;
+        --cinza-claro: #f4f4f5;
+        --cinza-medio: #e5e7eb;
+        --cinza-borda: #cbd5e1;
+        --branco: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+        background-color: var(--cinza-claro);
+        color: var(--azul-escuro);
+        line-height: 1.5;
+    }
+    .topbar {
+        background-color: var(--azul-escuro);
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 54px;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+    }
+    .topbar .marca {
+        color: var(--branco);
+        font-weight: 700;
+        font-size: 15px;
+        letter-spacing: 0.2px;
+    }
+    .topbar .marca span {
+        color: #93c5fd;
+    }
+    nav.dash-nav {
+        display: flex;
+        gap: 4px;
+    }
+    nav.dash-nav a {
+        color: #cbd5e1;
+        text-decoration: none;
+        padding: 8px 14px;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    nav.dash-nav a:hover,
+    nav.dash-nav a.ativo {
+        background-color: var(--azul);
+        color: var(--branco);
+    }
+    .subbar {
+        background-color: var(--azul);
+        padding: 10px 24px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .subbar .badge-perfil {
+        background-color: var(--azul-escuro);
+        color: var(--branco);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 4px 10px;
+        border-radius: 3px;
+    }
+    .subbar .titulo-dash {
+        color: var(--branco);
+        font-size: 14px;
+        font-weight: 600;
+    }
+    main {
+        max-width: 1200px;
+        margin: 28px auto;
+        padding: 0 20px 48px 20px;
+    }
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+    .kpi-card {
+        background-color: var(--branco);
+        border: 1px solid var(--cinza-borda);
+        border-left: 6px solid var(--azul);
+        border-radius: 8px;
+        padding: 20px 18px;
+        box-shadow: 0 1px 3px rgba(30,41,59,0.07);
+    }
+    .kpi-card .kpi-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #64748b;
+        margin-bottom: 8px;
+    }
+    .kpi-card .kpi-valor {
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--azul-escuro);
+        line-height: 1.1;
+    }
+    .kpi-card .kpi-sub {
+        font-size: 12px;
+        color: #64748b;
+        margin-top: 6px;
+    }
+    .secao {
+        background-color: var(--branco);
+        border: 1px solid var(--cinza-borda);
+        border-radius: 8px;
+        padding: 22px 24px;
+        margin-bottom: 22px;
+        box-shadow: 0 1px 3px rgba(30,41,59,0.06);
+        overflow-x: auto;
+    }
+    .secao-titulo {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        color: var(--azul);
+        border-bottom: 2px solid var(--cinza-medio);
+        padding-bottom: 10px;
+        margin-bottom: 16px;
+    }
+    .duas-colunas {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+        margin-bottom: 22px;
+    }
+    @media (max-width: 768px) {
+        .duas-colunas { grid-template-columns: 1fr; }
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    table th {
+        background-color: var(--azul-escuro);
+        color: var(--branco);
+        text-align: left;
+        padding: 10px 10px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+    }
+    table td {
+        padding: 9px 10px;
+        border-bottom: 1px solid var(--cinza-medio);
+        font-size: 13px;
+    }
+    table tr:nth-child(even) td {
+        background-color: var(--cinza-claro);
+    }
+    table tr:hover td {
+        background-color: var(--cinza-medio);
+    }
+    .barra-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .barra-bg {
+        flex: 1;
+        background-color: var(--cinza-medio);
+        border-radius: 3px;
+        height: 10px;
+        overflow: hidden;
+    }
+    .barra-fill {
+        background-color: var(--azul);
+        height: 10px;
+        border-radius: 3px;
+    }
+    .barra-pct {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--azul-escuro);
+        min-width: 36px;
+        text-align: right;
+    }
+    .tag {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 3px;
+        background-color: var(--cinza-medio);
+        color: var(--azul-escuro);
+    }
+    .tag-verde {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+    .tag-vermelha {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+    .tag-amarela {
+        background-color: #fef9c3;
+        color: #854d0e;
+    }
+    .rodape-dash {
+        text-align: center;
+        font-size: 11px;
+        color: #94a3b8;
+        margin-top: 28px;
+        border-top: 1px solid var(--cinza-borda);
+        padding-top: 16px;
+    }
+</style>
+</head>
+<body>
+<div class="topbar">
+    <div class="marca">Hospital <span>Olivia Gray</span></div>
+    <nav class="dash-nav">
+        <a href="{% url 'dashboard_diretor' %}" {% if request.resolver_match.url_name == 'dashboard_diretor' %}class="ativo"{% endif %}>Diretor-Geral</a>
+        <a href="{% url 'dashboard_chefe' %}" {% if request.resolver_match.url_name == 'dashboard_chefe' %}class="ativo"{% endif %}>Chefe de Depto.</a>
+        <a href="{% url 'dashboard_farmaceutico' %}" {% if request.resolver_match.url_name == 'dashboard_farmaceutico' %}class="ativo"{% endif %}>Farmacêutico</a>
+        <a href="{% url 'diagrama' %}" {% if request.resolver_match.url_name == 'diagrama' %}class="ativo"{% endif %}>Diagrama ER</a>
+        <a href="{% url 'dashboard' %}" {% if request.resolver_match.url_name == 'dashboard' %}class="ativo"{% endif %}>Dados</a>
+        <a href="{% url 'login' %}">Sair</a>
+    </nav>
+</div>
+<div class="subbar">
+    <span class="titulo-dash">{% block subtitulo %}{% endblock %}</span>
+</div>
+<main>
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>

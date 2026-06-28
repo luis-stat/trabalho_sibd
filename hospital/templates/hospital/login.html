@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Acesso ao Sistema</title>
+<style>
+    :root {
+        --azul: #1d4ed8;
+        --azul-escuro: #1e293b;
+        --cinza-claro: #f4f4f5;
+        --cinza-medio: #e5e7eb;
+        --cinza-borda: #cbd5e1;
+        --branco: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+        background-color: var(--azul-escuro);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .login-container {
+        background-color: var(--branco);
+        border-radius: 10px;
+        padding: 40px 44px;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.28);
+    }
+    .login-header {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+    .login-header .instituicao {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.4px;
+        color: var(--azul);
+        margin-bottom: 10px;
+    }
+    .login-header h1 {
+        font-size: 22px;
+        color: var(--azul-escuro);
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+    .login-header p {
+        font-size: 13px;
+        color: #64748b;
+    }
+    .divisor {
+        height: 3px;
+        background-color: var(--azul);
+        border-radius: 2px;
+        margin: 18px 0 28px 0;
+    }
+    label {
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        color: var(--azul-escuro);
+        margin-bottom: 5px;
+    }
+    input[type="text"],
+    input[type="password"],
+    select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--cinza-borda);
+        border-radius: 5px;
+        font-size: 14px;
+        color: var(--azul-escuro);
+        background-color: var(--cinza-claro);
+        margin-bottom: 18px;
+    }
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--azul);
+        background-color: var(--branco);
+    }
+    .btn-login {
+        width: 100%;
+        background-color: var(--azul);
+        color: var(--branco);
+        border: none;
+        padding: 12px;
+        border-radius: 5px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        letter-spacing: 0.3px;
+        margin-top: 4px;
+    }
+    .btn-login:hover {
+        background-color: var(--azul-escuro);
+    }
+    .rodape {
+        margin-top: 28px;
+        text-align: center;
+        font-size: 11px;
+        color: #94a3b8;
+    }
+</style>
+</head>
+<body>
+<div class="login-container">
+    <div class="login-header">
+        <h1>Hospital Olivia Gray</h1>
+        <p>Acesso restrito a usuários autorizados</p>
+    </div>
+    <div class="divisor"></div>
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        <label for="usuario">Usuário</label>
+        <input type="text" id="usuario" name="usuario" placeholder="Informe seu usuário" value="admin">
+
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha" placeholder="Informe sua senha" value="••••••">
+
+        <label for="perfil">Perfil de Acesso</label>
+        <select id="perfil" name="perfil">
+            <option value="diretor">Diretor-Geral</option>
+            <option value="chefe">Chefe de Departamento</option>
+            <option value="farmaceutico">Farmacêutico</option>
+        </select>
+
+        <button type="submit" class="btn-login">Entrar</button>
+    </form>
+</div>
+</body>
+</html>
