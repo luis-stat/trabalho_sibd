@@ -191,22 +191,195 @@ def diagrama(request):
 
 
 def sql_view(request):
-    statements = []
-    with connection.schema_editor(collect_sql=True, atomic=False) as schema_editor:
-        for cfg in MODEL_REGISTRY.values():
-            schema_editor.create_model(cfg["model"])
-        statements = schema_editor.collected_sql
+    sql_final = """CREATE TABLE convenio (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(150) NOT NULL,
+    percentual_repasse DECIMAL(5,2) NOT NULL,
+    prazo_pagamento INT NOT NULL
+);
 
-    blocos_limpos = []
-    for stmt in statements:
-        linhas = [
-            linha for linha in stmt.splitlines()
-            if linha.strip() and not linha.strip().startswith("--")
-        ]
-        if linhas:
-            blocos_limpos.append("\n".join(linhas))
+CREATE TABLE paciente (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(200) NOT NULL,
+    cpf VARCHAR(14) NOT NULL UNIQUE,
+    sexo VARCHAR(1) NOT NULL,
+    data_nascimento DATE NOT NULL,
+    endereco VARCHAR(255) NOT NULL,
+    telefone VARCHAR(20) NOT NULL,
+    convenio_id INT NULL,
+    FOREIGN KEY (convenio_id) REFERENCES convenio(id)
+);
 
-    sql_final = ";\n\n".join(blocos_limpos) + ";"
+CREATE TABLE funcionario (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(200) NOT NULL,
+    cargo VARCHAR(100) NOT NULL,
+    especialidade VARCHAR(100) NULL,
+    salario DECIMAL(10,2) NOT NULL,
+    setor VARCHAR(100) NOT NULL,
+    data_admissao DATE NOT NULL
+);
+
+CREATE TABLE equipamento (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    descricao VARCHAR(200) NOT NULL,
+    setor VARCHAR(100) NOT NULL,
+    data_aquisicao DATE NOT NULL,
+    custo_aquisicao DECIMAL(10,2) NOT NULL,
+    status VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE leito (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    setor VARCHAR(100) NOT NULL,
+    tipo VARCHAR(100) NOT NULL,
+    status VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE medicamento (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    descricao VARCHAR(200) NOT NULL,
+    lote VARCHAR(50) NOT NULL,
+    validade DATE NOT NULL,
+    quantidade_estoque INT NOT NULL,
+    custo_unitario DECIMAL(10,2) NOT NULL
+);
+
+CREATE TABLE atendimento (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    data_hora_chegada DATETIME NOT NULL,
+    data_hora_inicio DATETIME NULL,
+    data_hora_fim DATETIME NULL,
+    tipo_atendimento VARCHAR(50) NOT NULL,
+    paciente_id INT NOT NULL,
+    convenio_id INT NULL,
+    funcionario_id INT NULL,
+    FOREIGN KEY (paciente_id) REFERENCES paciente(id),
+    FOREIGN KEY (convenio_id) REFERENCES convenio(id),
+    FOREIGN KEY (funcionario_id) REFERENCES funcionario(id)
+);
+
+CREATE TABLE procedimento (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    especialidade VARCHAR(100) NOT NULL,
+    descricao VARCHAR(255) NOT NULL,
+    custo DECIMAL(10,2) NOT NULL,
+    valor_cobrado DECIMAL(10,2) NOT NULL,
+    duracao INT NOT NULL,
+    atendimento_id INT NOT NULL,
+    equipamento_id INT NULL,
+    FOREIGN KEY (atendimento_id) REFERENCES atendimento(id),
+    FOREIGN KEY (equipamento_id) REFERENCES equipamento(id)
+);
+
+CREATE TABLE exame (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tipo_exame VARCHAR(100) NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    data_solicitacao DATETIME NOT NULL,
+    data_resultado DATETIME NULL,
+    atendimento_id INT NOT NULL,
+    funcionario_id INT NOT NULL,
+    equipamento_id INT NULL,
+    FOREIGN KEY (atendimento_id) REFERENCES atendimento(id),
+    FOREIGN KEY (funcionario_id) REFERENCES funcionario(id),
+    FOREIGN KEY (equipamento_id) REFERENCES equipamento(id)
+);
+
+CREATE TABLE internacao (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    data_entrada DATETIME NOT NULL,
+    data_saida DATETIME NULL,
+    paciente_id INT NOT NULL,
+    leito_id INT NULL,
+    FOREIGN KEY (paciente_id) REFERENCES paciente(id),
+    FOREIGN KEY (leito_id) REFERENCES leito(id)
+);
+
+CREATE TABLE movimentacao_estoque (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tipo_movimentacao VARCHAR(50) NOT NULL,
+    quantidade INT NOT NULL,
+    data DATETIME NOT NULL,
+    setor_destino VARCHAR(100) NULL,
+    medicamento_id INT NOT NULL,
+    funcionario_id INT NOT NULL,
+    FOREIGN KEY (medicamento_id) REFERENCES medicamento(id),
+    FOREIGN KEY (funcionario_id) REFERENCES funcionario(id)
+);
+
+CREATE TABLE manutencao (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    data_abertura DATE NOT NULL,
+    data_fechamento DATE NULL,
+    custo DECIMAL(10,2) NOT NULL,
+    tipo VARCHAR(100) NOT NULL,
+    equipamento_id INT NOT NULL,
+    FOREIGN KEY (equipamento_id) REFERENCES equipamento(id)
+);
+
+CREATE TABLE escala (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    data_hora DATETIME NOT NULL,
+    turno VARCHAR(20) NOT NULL,
+    plantao VARCHAR(50) NOT NULL,
+    horas INT NOT NULL,
+    funcionario_id INT NOT NULL,
+    FOREIGN KEY (funcionario_id) REFERENCES funcionario(id)
+);
+
+CREATE TABLE pesquisa_satisfacao (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nota INT NOT NULL,
+    comentario TEXT NULL,
+    data_avaliacao DATETIME NOT NULL,
+    atendimento_id INT NOT NULL UNIQUE,
+    FOREIGN KEY (atendimento_id) REFERENCES atendimento(id)
+);
+
+CREATE TABLE ausencia_falta (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    data_inicio DATETIME NOT NULL,
+    data_fim DATETIME NULL,
+    motivo TEXT NOT NULL,
+    tipo VARCHAR(50) NOT NULL,
+    funcionario_id INT NOT NULL,
+    FOREIGN KEY (funcionario_id) REFERENCES funcionario(id)
+);
+
+CREATE TABLE processo_juridico (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tipo VARCHAR(100) NOT NULL,
+    data_abertura DATE NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    custo_estimado DECIMAL(12,2) NOT NULL,
+    paciente_id INT NOT NULL,
+    FOREIGN KEY (paciente_id) REFERENCES paciente(id)
+);
+
+CREATE TABLE financeiro (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    categoria VARCHAR(100) NOT NULL,
+    valor DECIMAL(12,2) NOT NULL,
+    data DATE NOT NULL,
+    centro_custo VARCHAR(100) NOT NULL,
+    tipo_receita_despesa VARCHAR(20) NOT NULL,
+    atendimento_id INT NULL,
+    procedimento_id INT NULL,
+    convenio_id INT NULL,
+    equipamento_id INT NULL,
+    medicamento_id INT NULL,
+    funcionario_id INT NULL,
+    processo_juridico_id INT NULL,
+    FOREIGN KEY (atendimento_id) REFERENCES atendimento(id),
+    FOREIGN KEY (procedimento_id) REFERENCES procedimento(id),
+    FOREIGN KEY (convenio_id) REFERENCES convenio(id),
+    FOREIGN KEY (equipamento_id) REFERENCES equipamento(id),
+    FOREIGN KEY (medicamento_id) REFERENCES medicamento(id),
+    FOREIGN KEY (funcionario_id) REFERENCES funcionario(id),
+    FOREIGN KEY (processo_juridico_id) REFERENCES processo_juridico(id)
+);"""
+    
     return render(request, "hospital/sql.html", {"sql": sql_final})
 
 
